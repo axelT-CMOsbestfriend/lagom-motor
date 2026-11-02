@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand: axeltuvemo.com – varm, editoriell. Marknadspiloten är en subdomän. */
+  --color-background: #f9f7ee; /* varm cream */
+  --color-surface: #ffffff;
+  --color-foreground: #0f0d0b; /* nästan svart */
+  --color-primary: #0f0d0b;
+  --color-on-primary: #f9f7ee; /* cream text på mörk knapp */
+  --color-secondary: #423c37; /* varm mörk brödtext */
+  --color-muted: #f0ebdc; /* varm parchment-ton för ikon-badges/fyllnader */
+  --color-muted-foreground: #7a7167; /* varm grå hjälptext */
+  --color-border: #e7e1d2; /* varm ljus kantlinje */
+  --color-accent: #0f0d0b; /* funktionell accent = nästan svart (länkar, fokus, CTA) */
+  --color-accent-hover: #2b2620;
+  --color-highlight: #fed835; /* varumärkets guld – dekorativ highlight */
+  --color-success: #3f7a4b;
+  --color-destructive: #b4341f;
+  --color-ring: #0f0d0b;
+}
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-primary: var(--color-primary);
+  --color-accent: var(--color-accent);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
+  --font-sans: var(--font-karla);
+  --font-display: var(--font-cormorant);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-karla), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+/* Staggered entrance – standard motion tier */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Synlig fokusring för tangentbordsnavigering */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}

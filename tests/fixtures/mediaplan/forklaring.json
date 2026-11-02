@@ -1,0 +1,87 @@
+{
+  "_ursprung": "Handskrivet exempel på ett giltigt svar, inte inspelat från Claude. Ersätts av `npm run mediaplan -- --spela-in` när en API-nyckel finns.",
+  "recommendedPlanId": "rackvidd",
+  "summary": "Nå flest når flest, 51 av 100 i målgruppen minst en gång mot 49 av 100 för Sälj nu. Skillnaden är liten. Välj Nå flest om målet är tillväxt över året och Sälj nu om kampanjen ska sälja direkt.",
+  "channelReasons": [
+    {
+      "planId": "rackvidd",
+      "channel": "facebook",
+      "reason": "75 av 100 i målgruppen använder Facebook en vanlig dag, och 80 000 kr här når 25 av 100 i målgruppen utan spill.",
+      "ruleIds": [
+        "EB-01",
+        "DATA-01"
+      ],
+      "factIds": [
+        "F-PEN-facebook",
+        "F-rackvidd-facebook"
+      ]
+    },
+    {
+      "planId": "rackvidd",
+      "channel": "instagram",
+      "reason": "Instagram når 21 av 100 i målgruppen. Räckvidden i en kanal planar ut, så nästa krona gör mer nytta här än som mer Facebook.",
+      "ruleIds": [
+        "NBD-01",
+        "EB-01"
+      ],
+      "factIds": [
+        "F-rackvidd-instagram"
+      ]
+    },
+    {
+      "planId": "rackvidd",
+      "channel": "snapchat",
+      "reason": "28 av 100 i målgruppen använder Snapchat, och 30 000 kr når 11 av 100. Det breddar räckvidden till personer som de två största kanalerna missar.",
+      "ruleIds": [
+        "NBD-01",
+        "DATA-01"
+      ],
+      "factIds": [
+        "F-PEN-snapchat",
+        "F-rackvidd-snapchat"
+      ]
+    },
+    {
+      "planId": "rackvidd",
+      "channel": "youtube",
+      "reason": "Youtube får minst och når 6 av 100 i målgruppen. Posten är liten men ger helskärmsvideo, som får mer uppmärksamhet per visning än flöden.",
+      "ruleIds": [
+        "ATT-01"
+      ],
+      "factIds": [
+        "F-rackvidd-youtube"
+      ]
+    }
+  ],
+  "rejectedPlans": [
+    {
+      "planId": "aktivering",
+      "reason": "Sälj nu når fler minst tre gånger, 13 mot 11 av 100, men färre totalt, 49 mot 51 av 100. Den passar bättre om kampanjen ska sälja under perioden.",
+      "ruleIds": [
+        "FREQ-01",
+        "BF-03"
+      ],
+      "factIds": [
+        "F-aktivering-3PLUS",
+        "F-rackvidd-3PLUS",
+        "F-aktivering-RACKVIDD",
+        "F-rackvidd-RACKVIDD"
+      ]
+    },
+    {
+      "planId": "luckan",
+      "reason": "Den planen undviker Facebook och Instagram, där konkurrenterna antas finnas, men når bara 37 av 100. Antagandet om konkurrenterna är dessutom inte uppmätt.",
+      "ruleIds": [
+        "ESOV-01"
+      ],
+      "factIds": [
+        "F-luckan-RACKVIDD",
+        "F-KONKURRENTER"
+      ]
+    }
+  ],
+  "risks": [
+    "CPM-nivåerna bakom simuleringen är inte verifierade, därför är spannen breda.",
+    "Konkurrenternas kanaler är ett antagande tills annonsbiblioteken är inlästa."
+  ]
+}

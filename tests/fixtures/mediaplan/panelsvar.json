@@ -1,0 +1,41 @@
+{
+  "_ursprung": "Handskrivet exempel på ett giltigt svar, inte inspelat från Claude. Ersätts av `npm run mediaplan -- --spela-in` när en API-nyckel finns.",
+  "answers": [
+    {
+      "personaId": "p1",
+      "noticedIn": ["facebook"],
+      "moment": "När jag scrollar Facebook i soffan på kvällen.",
+      "quote": "Jag skulle nog se den, men scrolla förbi om den inte säger direkt vad jag har för nytta av den."
+    },
+    {
+      "personaId": "p5",
+      "noticedIn": ["instagram", "facebook"],
+      "moment": "På morgonen innan jobbet och en stund på kvällen.",
+      "quote": "Ser jag samma sak på både Instagram och Facebook börjar jag känna igen namnet, även om jag inte klickar."
+    },
+    {
+      "personaId": "p2",
+      "noticedIn": ["youtube"],
+      "moment": "Innan en video på Youtube, när jag väntar på att kunna hoppa över.",
+      "quote": "Jag hoppar över så fort jag kan, så de första sekunderna får säga allt."
+    },
+    {
+      "personaId": "p7",
+      "noticedIn": ["snapchat", "instagram"],
+      "moment": "Mellan storys på Snapchat och Instagram under lunchen.",
+      "quote": "Storys hinner jag faktiskt titta på, men den måste se ut som något en vän kunde ha lagt upp."
+    },
+    {
+      "personaId": "p3",
+      "noticedIn": ["instagram"],
+      "moment": "I flödet på Instagram, ganska sällan.",
+      "quote": "Jag är inte så mycket på Instagram, så jag tror inte att jag skulle minnas den."
+    },
+    {
+      "personaId": "p34",
+      "noticedIn": [],
+      "moment": "Aldrig, jag är inte i de kanalerna.",
+      "quote": "Jag lyssnar på poddar och läser morgontidningen, så den här kampanjen skulle gå mig helt förbi."
+    }
+  ]
+}
