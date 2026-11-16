@@ -1,6 +1,6 @@
 # Lagom motor
 
-Motorn bakom [Lagom Digitals](https://lagom-digital.vercel.app) digitala produkter. En AI-agent beställer en marknadsanalys med ett anrop via [MCP](https://modelcontextprotocol.io) och får tillbaka ett färdigt resultat på några minuter. Samma motor driver också en webbapp för människor.
+Motorn bakom [Lagom Digitals](https://lagom-mcp-agency.lovable.app) digitala produkter. En AI-agent beställer en marknadsanalys med ett anrop via [MCP](https://modelcontextprotocol.io) och får tillbaka ett färdigt resultat på några minuter. Samma motor driver också en webbapp för människor.
 
 Koden är öppen under MIT-licens. Ni kan läsa exakt hur resultaten räknas fram, köra motorn själva eller bygga vidare på den.
 
@@ -24,7 +24,7 @@ Koden är öppen under MIT-licens. Ni kan läsa exakt hur resultaten räknas fra
 
 ## Koppla in en agent
 
-Mot Lagom Digitals publicerade motor behövs en API-nyckel, som ni får [av oss](https://lagom-digital.vercel.app/kontakt):
+Mot Lagom Digitals publicerade motor behövs en API-nyckel, som ni får [av oss](https://lagom-mcp-agency.lovable.app/kontakt):
 
 ```bash
 claude mcp add --transport http lagom https://lagom-hq-motor.vercel.app/api/mcp --header "Authorization: Bearer lagom_..."
