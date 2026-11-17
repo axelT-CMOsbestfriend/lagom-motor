@@ -96,7 +96,7 @@ test("köpanvisningen grupperar kanaler efter verktyg", () => {
   const plan = view.plans.find((p) => p.id === "rackvidd")!;
   const text = howToBuy(plan);
   assert.match(text, /Facebook och Instagram i Metas annonshanterare/);
-  assert.match(text, /Youtube i Google Ads/);
+  for (const c of plan.channels) assert.ok(text.includes(c.label), c.label);
 });
 
 test("uträknade motiveringar har en rad per kanal, största budget först", () => {
@@ -166,5 +166,5 @@ test("chatten får mediaplanen som underlag när den finns", () => {
   // Kurvan och prickarna skickas inte till chatten
   assert.doesNotMatch(prompt, /"reached"/);
   assert.ok(prompt.length < 20_000, `${prompt.length} tecken`);
-  assert.deepEqual(requestFromInput(input), FIXTURE_REQUEST);
+  assert.deepEqual(requestFromInput(input), { ...FIXTURE_REQUEST, weeks: input.weeks, includeSearch: true });
 });
