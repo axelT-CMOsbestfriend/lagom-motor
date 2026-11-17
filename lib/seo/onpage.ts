@@ -40,6 +40,8 @@ function pageRules(page: CrawledPage, isHome: boolean): Rule[] {
   const meta = page.metaDescription ?? "";
   if (!meta) {
     add({ rule: "meta-saknas", severity: "medel", detail: "Metabeskrivning saknas, så Google väljer en egen text.", fix: "Skriv en metabeskrivning på 120–160 tecken som säger varför man ska klicka.", effortHours: 0.25 });
+  } else if (meta.length < 50) {
+    add({ rule: "meta-for-kort", severity: "låg", detail: `Metabeskrivningen är bara ${meta.length} tecken.`, fix: "Skriv en metabeskrivning på 120–160 tecken som säger varför man ska klicka.", effortHours: 0.25 });
   } else if (meta.length > 160) {
     add({ rule: "meta-for-lang", severity: "låg", detail: `Metabeskrivningen är ${meta.length} tecken.`, fix: "Korta den till högst 160 tecken.", effortHours: 0.25 });
   }
@@ -50,7 +52,9 @@ function pageRules(page: CrawledPage, isHome: boolean): Rule[] {
     add({ rule: "flera-h1", severity: "låg", detail: `Sidan har ${page.h1.length} H1-rubriker.`, fix: "Behåll en H1 och gör resten till H2.", effortHours: 0.25 });
   }
 
-  if (page.wordCount < 250) {
+  if (page.wordCount < 50) {
+    add({ rule: "tom-sida", severity: "hög", detail: `Sidan har ${page.wordCount} ord i sin HTML. Innehållet byggs troligen med JavaScript, och då ser Google och AI-assistenterna en nästan tom sida.`, fix: "Rendera innehållet på servern (SSR eller förrendering) så att texten finns i HTML:en.", effortHours: 6 });
+  } else if (page.wordCount < 250) {
     add({ rule: "tunt-innehall", severity: "medel", detail: `Sidan har bara ${page.wordCount} ord.`, fix: "Bygg ut texten till minst 300 ord som svarar på kundens frågor.", effortHours: 2 });
   }
   if (!page.hasViewportMeta) {
@@ -58,6 +62,26 @@ function pageRules(page: CrawledPage, isHome: boolean): Rule[] {
   }
   if (page.canonical === null) {
     add({ rule: "canonical-saknas", severity: "låg", detail: "Canonical-länk saknas.", fix: "Lägg till <link rel=\"canonical\"> som pekar på sidans egen adress.", effortHours: 0.5 });
+  }
+  if (page.canonical) {
+    let target: URL | null = null;
+    try {
+      target = new URL(page.canonical, page.url);
+    } catch {
+      target = null;
+    }
+    const own = new URL(page.url);
+    const norm = (u: URL) => u.pathname.replace(/\/$/, "") || "/";
+    if (!target) {
+      add({ rule: "canonical-ogiltig", severity: "medel", detail: `Canonical "${page.canonical}" är ingen giltig adress.`, fix: "Låt canonical peka på sidans egen fullständiga adress.", effortHours: 0.5 });
+    } else if (target.hostname.replace(/^www\./, "") !== own.hostname.replace(/^www\./, "")) {
+      add({ rule: "canonical-annan-doman", severity: "hög", detail: `Canonical pekar på en annan domän (${target.hostname}). Google kan då indexera den adressen i stället.`, fix: "Låt canonical peka på sidans egen adress på er domän.", effortHours: 0.5 });
+    } else if (norm(target) !== norm(own)) {
+      add({ rule: "canonical-annan-sida", severity: "medel", detail: `Canonical pekar på ${target.pathname} i stället för sidan själv.`, fix: "Kontrollera att canonical pekar på rätt sida. Annars visas sidan inte i Google.", effortHours: 0.5 });
+    }
+  }
+  if (page.lang && /^en/i.test(page.lang) && looksSwedish(page.textExcerpt)) {
+    add({ rule: "lang-fel-sprak", severity: "medel", detail: `Sidan säger lang="${page.lang}" men texten är på svenska.`, fix: 'Sätt <html lang="sv"> på svenska sidor.', effortHours: 0.1 });
   }
   if (page.metaRobots?.includes("noindex")) {
     add({ rule: "noindex", severity: "hög", detail: "Sidan ber Google att inte indexera den (noindex).", fix: "Ta bort noindex om sidan ska synas i sökresultaten.", effortHours: 0.25 });
@@ -73,11 +97,27 @@ function pageRules(page: CrawledPage, isHome: boolean): Rule[] {
     if (page.ogImage === null) {
       add({ rule: "og-bild-saknas", severity: "låg", detail: "Ingen og:image, så delningar i sociala medier saknar bild.", fix: "Lägg till en og:image på 1200×630 px.", effortHours: 0.5 });
     }
+    const schema = page.schemaTypes ?? [];
+    const local = schema.some((t) => /LocalBusiness|Store|Restaurant|Plumber|Electrician|Dentist|Hair|Beauty|Contractor|Service|Shop/i.test(t));
+    if (page.hasPostcode && schema.length > 0 && !local) {
+      add({ rule: "lokalt-schema-saknas", severity: "medel", detail: "Sajten har en adress men inget LocalBusiness-schema.", fix: "Lägg till LocalBusiness-schema med samma namn, adress och telefon som i Google-företagsprofilen.", effortHours: 1 });
+    }
+    if (page.hasPhone === false) {
+      add({ rule: "telefon-saknas", severity: "medel", detail: "Startsidan visar inget telefonnummer.", fix: "Visa telefonnummer (gärna klickbart, tel:) i sidhuvud eller sidfot, likadant som i Google-företagsprofilen.", effortHours: 0.25 });
+    }
     if (page.lang === null) {
       add({ rule: "lang-saknas", severity: "låg", detail: "<html> saknar lang-attribut.", fix: 'Sätt <html lang="sv">.', effortHours: 0.1 });
     }
   }
   return out;
+}
+
+// Enkelt test för svensk text: vanliga svenska småord eller många å, ä, ö
+function looksSwedish(text: string): boolean {
+  if (!text) return false;
+  const small = text.toLowerCase().match(/\b(och|att|för|med|är|vi|på|som|av|till|det)\b/g)?.length ?? 0;
+  const letters = (text.match(/[åäöÅÄÖ]/g)?.length ?? 0) / text.length;
+  return small >= 5 || letters > 0.01;
 }
 
 export function auditOnPage(crawl: CrawlResult): OnPageResult {
@@ -108,7 +148,7 @@ export function auditOnPage(crawl: CrawlResult): OnPageResult {
       rule: "sitemap-saknas",
       severity: "medel",
       page: crawl.baseUrl,
-      detail: "Ingen sitemap.xml hittades.",
+      detail: "Ingen sitemap hittades, varken i robots.txt, /sitemap.xml eller /sitemap_index.xml.",
       fix: "Skapa en sitemap.xml och anmäl den i Google Search Console.",
       effortHours: 0.5,
     });

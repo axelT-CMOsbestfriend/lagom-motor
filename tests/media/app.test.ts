@@ -23,7 +23,7 @@ test("formuläret: giltig inmatning tolkas och städas", () => {
   if (!r.ok) return;
   assert.equal(r.input.budgetSek, 200_000);
   assert.deepEqual(r.input.genders, ["kvinna", "man"]);
-  assert.deepEqual(requestFromInput(r.input), FIXTURE_REQUEST);
+  assert.deepEqual(requestFromInput(r.input), { ...FIXTURE_REQUEST, weeks: r.input.weeks, includeSearch: true });
 });
 
 test("formuläret: ogiltig inmatning ger begripligt fel", () => {

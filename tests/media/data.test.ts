@@ -56,3 +56,12 @@ test("alla kanaler har ett CPM-intervall och ett antagande", () => {
     assert.equal(spec.cpmAssumption.id, `cpm-${id}`);
   }
 });
+
+import { LAN_SHARE, SWEDEN_POPULATION_2025 } from "../../lib/media/data/scb-lan-2025";
+
+test("länen summerar till SCB:s folkmängd 2025 och andelarna till 1", () => {
+  assert.equal(Object.keys(LAN_SHARE).length, 21);
+  assert.equal(SWEDEN_POPULATION_2025, 10_605_535);
+  const sum = Object.values(LAN_SHARE).reduce((s, l) => s + l.share, 0);
+  assert.ok(Math.abs(sum - 1) < 1e-9);
+});

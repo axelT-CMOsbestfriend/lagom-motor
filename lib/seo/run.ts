@@ -104,9 +104,11 @@ function buildActions(
       const first = issues[0];
       actions.push({
         title: issues.length > 1 ? `${first.fix} (${issues.length} sidor)` : first.fix,
-        why: first.detail,
+        why: issues.length > 1 ? `${first.detail} Gäller ${issues.length} sidor.` : first.detail,
         impact: IMPACT[first.severity],
-        effortHours: Math.min(8, first.effortHours * issues.length),
+        // Samma rättning på flera sidor görs oftast i en mall, så tiden
+        // växer långsamt med antalet sidor
+        effortHours: Math.min(8, Math.round((first.effortHours + 0.1 * (issues.length - 1)) * 10) / 10),
         source: "on-page",
       });
     }
@@ -137,7 +139,8 @@ function buildActions(
 
   if (a.keywords.ok) actions.push(...keywordActions(a.keywords.data.keywords, existingPaths));
 
-  return actions.sort((x, y) => y.impact / y.effortHours - x.impact / x.effortHours).slice(0, 10);
+  // Allvarligast först, och inom samma nivå det som går snabbast
+  return actions.sort((x, y) => y.impact - x.impact || x.effortHours - y.effortHours).slice(0, 10);
 }
 
 function scoreLine(label: string, p: Part<{ score: number }>): string {

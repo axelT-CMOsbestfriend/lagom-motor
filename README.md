@@ -19,7 +19,9 @@ Koden är öppen under MIT-licens. Ni kan läsa exakt hur resultaten räknas fra
 - **SEO, teknisk del:** fasta regler utan AI i [lib/seo/onpage.ts](lib/seo/onpage.ts). Samma sajt ger alltid samma svar.
 - **SEO, sökord:** volymerna är Claudes uppskattning och märks så i resultatet. Motorn köper inga sökvolymer.
 - **Mediaplan:** räckvidden räknas fram ur befolkningsdata från SCB och kanalvanor från Mediebarometern ([lib/media/data/](lib/media/data/)). Reglerna som styr planerna finns i [lib/media/rules.ts](lib/media/rules.ts). Antaganden som inte kunnat kontrolleras listas i varje leverans.
-- **Hälsokoll:** körs i två steg. Först letas konkurrenter upp med webbsökning, sedan skrivs analysen utifrån sajten och researchen. Varje påstående anger vad det bygger på.
+- **Mediaplan, nytt:** målgruppen kan avgränsas till ett län. En del av budgeten går till Google-sök före räckviddskanalerna (H-04). B2B får alltid Linkedin och aldrig Snapchat eller Tiktok (H-03). Kampanjens längd styr ett frekvenstak (H-05). Under 10 000 kr ges råd i stället för en plan.
+- **SEO, crawlern:** följer omdirigeringar, läser `robots.txt` och sitemap-index (WordPress, Yoast) och hoppar över sidor över 5 MB. Åtgärderna sorteras på allvarlighet först, sedan på tid.
+- **Hälsokoll:** körs i två steg. Först letas konkurrenter upp med webbsökning, sedan skrivs analysen utifrån sajten och researchen. Varje konkurrent kontrolleras mot sin sajt, och konkurrenter som inte fanns i researchen tas bort. Varje påstående måste peka på en crawlad sida, kundens brief eller en verifierad konkurrent. Annars görs analysen om en gång, och punkter som fortfarande saknar källa markeras som `unverified` ([lib/verify.ts](lib/verify.ts)).
 - **Misslyckade jobb kostar inget:** en order som går fel eller hänger sig räknas tillbaka till kvoten ([lib/agent/services.ts](lib/agent/services.ts)).
 
 ## Koppla in en agent

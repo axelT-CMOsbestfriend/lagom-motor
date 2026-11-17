@@ -21,7 +21,8 @@ export interface Order {
 }
 
 const COLLECTION = "orders";
-const STALE_MS = 10 * 60 * 1000;
+// Strax över två steg à 240 s, så att ett dött jobb upptäcks snabbt
+const STALE_MS = 6 * 60 * 1000;
 
 export async function createOrder(
   apiKeyId: string,

@@ -211,6 +211,30 @@ export const RULES = [
       title: "Egen tumregel, ska valideras",
     },
   },
+  {
+    id: "H-03",
+    kind: "heuristik",
+    claim:
+      "B2B-köpare nås bäst där de är i yrkesrollen. Minst 40 % av displaybudgeten läggs i Linkedin, och Snapchat och Tiktok tas inte med.",
+    implication: "B2B-planer får alltid Linkedin, även när andra kanaler ger billigare räckvidd.",
+    source: { author: "Lagom Digital", year: null, title: "Egen tumregel, ska valideras" },
+  },
+  {
+    id: "H-04",
+    kind: "heuristik",
+    claim:
+      "Sökannonser fångar dem som redan letar och ger oftast bäst avkastning för småföretag. 40 % av budgeten (B2B 30 %) läggs i Google-sök före räckviddskanalerna.",
+    implication: "Räckviddsplanerna räknas på resten av budgeten.",
+    source: { author: "Lagom Digital", year: null, title: "Egen tumregel, ska valideras" },
+  },
+  {
+    id: "H-05",
+    kind: "heuristik",
+    claim:
+      "Mer än i snitt två visningar per person och vecka i en kanal ger knappt någon extra effekt. Budget över taket läggs inte i kanalen.",
+    implication: "Stora budgetar sprids eller lämnas delvis oanvända i stället för att mätta en kanal.",
+    source: { author: "Lagom Digital", year: null, title: "Egen tumregel, ska valideras" },
+  },
 ] as const satisfies readonly Rule[];
 
 export type RuleId = (typeof RULES)[number]["id"];
