@@ -50,10 +50,12 @@ test("en del som fallerar stoppar inte resten av auditen", async () => {
   assert.ok(audit.overallScore >= 0 && audit.overallScore <= 100);
 });
 
-test("åtgärderna sorteras efter effekt per arbetstimme", async () => {
+test("åtgärderna sorteras på allvarlighet först och sedan på tid", async () => {
   const audit = await runSeoAudit({ websiteUrl: "exempel.se" }, deps);
-  const ratios = audit.actions.map((a) => a.impact / a.effortHours);
-  assert.deepEqual(ratios, [...ratios].sort((a, b) => b - a));
+  for (let i = 1; i < audit.actions.length; i++) {
+    const [a, b] = [audit.actions[i - 1], audit.actions[i]];
+    assert.ok(a.impact > b.impact || (a.impact === b.impact && a.effortHours <= b.effortHours));
+  }
 });
 
 test("misslyckad crawl ger ett fel", async () => {

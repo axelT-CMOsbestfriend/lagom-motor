@@ -30,6 +30,8 @@ export interface CrawledPage {
   imagesWithoutAlt?: number;
   schemaTypes?: string[];
   ogImage?: string | null;
+  hasPhone?: boolean;
+  hasPostcode?: boolean;
 }
 
 export interface CrawlResult {
