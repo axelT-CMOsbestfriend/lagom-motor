@@ -1,4 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
+import {
+  groundHealthCheck,
+  parseCompetitorResearch,
+  parseHealthCheck,
+  verifyCompetitors,
+} from "./verify";
 import type {
   AnalysisRecord,
   Brief,
@@ -15,7 +21,8 @@ export function getClient(): Anthropic {
       "ANTHROPIC_API_KEY saknas. Skapa .env.local med ANTHROPIC_API_KEY=sk-ant-..."
     );
   }
-  return new Anthropic();
+  // Under Vercels tak på 300 s per anrop, med omförsök vid 429/529
+  return new Anthropic({ timeout: 240_000, maxRetries: 2 });
 }
 
 export function textFrom(message: Anthropic.Message): string {
@@ -149,7 +156,7 @@ const HEALTH_CHECK_SYSTEM = `Du är en erfaren svensk marknadschef (CMO) och var
 
 REGLER:
 - Basera ALLT på det faktiska underlaget (crawldata + brief + konkurrentresearch). Inga generiska råd.
-- Varje styrka och gap MÅSTE referera till en konkret observation i "source"-fältet (t.ex. "startsidan saknar meta-beskrivning", "inga kundcase på sajten", "konkurrent X rankar på 'begrepp Y'").
+- Varje styrka och gap MÅSTE ha en spårbar källa i "source"-fältet. Källan ska börja med en av dessa: den crawlade sidans URL (t.ex. "https://exempel.se/tjanster: saknar meta-beskrivning"), "startsidan: ..." , "brief: ..." (kundens egna svar) eller konkurrentens namn från KONKURRENTRESEARCH. Skriv aldrig en källa du inte kan peka på i underlaget.
 - Skriv på begriplig svenska utan byråjargong. Förklara alltid VARFÖR något spelar roll, som en tålmodig kollega.
 - Konkurrenterna kommer från KONKURRENTRESEARCH i underlaget, som redan är gjord med webbsökning. Hitta inte på andra konkurrenter.
 - Handlingsplanen ska vara prioriterad: 30 dagar = snabba grundläggande fixar, 60 dagar = bygga närvaro, 90 dagar = tillväxt/mätning. 3–4 punkter per period, konkreta uppgifter ("gör detta"), med motivering.
@@ -196,11 +203,14 @@ export async function researchCompetitors(
   crawl: CrawlResult
 ): Promise<CompetitorResearch> {
   const crawlBrief = summarizeCrawl({ ...crawl, pages: crawl.pages.slice(0, 2) });
-  return askJsonWithWebSearch<CompetitorResearch>(
+  const raw = await askJsonWithWebSearch<unknown>(
     RESEARCH_SYSTEM,
     `${briefText(brief)}\n\nKUNDENS WEBBPLATS (UTDRAG):\n${crawlBrief}`,
     5
   );
+  const { research, dropped } = await verifyCompetitors(parseCompetitorResearch(raw), brief.websiteUrl);
+  if (dropped.length > 0) console.warn(`Konkurrenter som togs bort: ${dropped.join(", ")}`);
+  return research;
 }
 
 // Steg 2: själva hälsokollet, utan webbsökning, byggt på crawl och research
@@ -221,15 +231,28 @@ export async function runHealthCheck(
     "Gör Marknadshälsokollet nu.",
   ].join("\n");
 
-  const response = await getClient()
-    .messages.stream({
-      model: MODEL,
-      max_tokens: 32000,
-      system: HEALTH_CHECK_SYSTEM,
-      messages: [{ role: "user", content: userContent }],
-    })
-    .finalMessage();
-  return extractJson<HealthCheck>(textFrom(response));
+  const messages: Anthropic.MessageParam[] = [{ role: "user", content: userContent }];
+  // Ett nytt försök om svaret inte följer schemat eller har källor som inte
+  // går att spåra. Andra gången skickas felen med som rättelse.
+  for (let attempt = 1; ; attempt++) {
+    const response = await getClient()
+      .messages.stream({ model: MODEL, max_tokens: 32000, system: HEALTH_CHECK_SYSTEM, messages })
+      .finalMessage();
+    const text = textFrom(response);
+    let problem: string;
+    try {
+      const parsed = parseHealthCheck(extractJson<unknown>(text));
+      const { healthCheck, report } = groundHealthCheck(parsed, crawl, research);
+      if (report.ungrounded.length === 0 || attempt >= 2) {
+        return { ...healthCheck, unverified: report.ungrounded.length > 0 ? report.ungrounded : undefined };
+      }
+      problem = `Dessa punkter saknar spårbar källa: ${report.ungrounded.join("; ")}. Ange en källa enligt reglerna eller ta bort punkten.`;
+    } catch (err) {
+      if (attempt >= 2) throw err;
+      problem = `Svaret följde inte schemat: ${err instanceof Error ? err.message.slice(0, 500) : String(err)}`;
+    }
+    messages.push({ role: "assistant", content: text }, { role: "user", content: `${problem}\nSkicka hela JSON-svaret igen.` });
+  }
 }
 
 const CHAT_FREE_QUESTION_LIMIT = 3;

@@ -83,6 +83,8 @@ export interface HealthCheck {
   gaps: Gap[];
   competitors: CompetitorOverview[];
   plan: PlanPhase[];
+  // Titlar på punkter vars källa inte gick att spåra efter ett nytt försök
+  unverified?: string[];
 }
 
 export type AnalysisStatus =
