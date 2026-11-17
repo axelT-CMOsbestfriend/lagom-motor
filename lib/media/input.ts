@@ -1,6 +1,6 @@
 import type { Gender } from "./data/mediebarometern-2024";
 import { MAX_AGE, MIN_AGE } from "./data/scb-befolkning-2025";
-import { LAN_SHARE } from "./data/scb-lan-2024";
+import { LAN_SHARE } from "./data/scb-lan-2025";
 import type { PlanRequest } from "./planner";
 
 // Det användaren fyller i under hälsokollet för att få en mediaplan
